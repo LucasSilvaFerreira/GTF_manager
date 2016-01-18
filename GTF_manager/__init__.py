@@ -4,8 +4,7 @@ import sys
 import re
 from tqdm import tqdm
 from pybedtools import BedTool, tempfiles
-import copy
-
+import cPickle
 
 class Transcript():
     def __init__(self, transcript_name, exons_array, attr_list):
@@ -24,7 +23,6 @@ class Transcript():
 
     def transcript_exons_length_sum(self):
         return self.__get_transcrip_size()
-
 
     def exon_size(self, one_exon_in_array):
         return int(one_exon_in_array[4]) - int(one_exon_in_array[3])
@@ -64,7 +62,6 @@ class Transcript():
         chr, start, end = map(str, self.locus_coords())
         return '\t'.join([chr, start, end, self.transcript_name, self.gene_info, self.strand])
 
-
 class Gene_content():
     def __init__(self, gene_id,
                  strand,
@@ -72,7 +69,6 @@ class Gene_content():
                  info_gene_str,
                  attr_transcript_field
                  ):
-        print 'O PARSER DE ATTRS deve mostrar apenas os campos que se repetem. Ou os attrs ficaram com informacoes que modificam entre os de exons'
         self.gene_id = gene_id
         self.gene_info = info_gene_str
         self.strand = strand  # checar se strand existe na posicao correta else: return error
@@ -121,7 +117,6 @@ class Gene_content():
                            attr_list=self.__child_transcript_possible_fields) for ts_key, ts_values_array in
                 self.transcripts_ids.iteritems()]
 
-
 class GTF_manager():
     def __init__(self, gtf_file):
         """GTF_managers offers a easy-use parser to handle gtf files.
@@ -149,10 +144,11 @@ class GTF_manager():
         Args:
             gtf_file (str): system PATH with a gtf file.
         """
+        print 'O PARSER DE ATTRS deve mostrar apenas os campos que se repetem. Ou os attrs ficariam com informacoes que modificam entre os de exons'
         self.file_name = gtf_file
         self.gtf_file_open = [line_gtf.split('\t') for line_gtf in open(gtf_file, 'r').read().split('\n') if
                               len(line_gtf) > 0]
-        self.__attr_list = {}
+        self.__attr_list = {} # pode dar erro depois de extrair genes utilizando select
         self.genes_hash = self.__parse_lines()
 
     def __parse_lines(self):
@@ -210,6 +206,9 @@ class GTF_manager():
 
         print '\n Parsing finished...'
 
+    def number_of_genes_loci(self):
+        return len(self.genes_hash)
+
     def gene_list(self):
         """
 
@@ -251,8 +250,9 @@ class GTF_manager():
                 print remove_id
         if len(ids_not_fount) > 0:
             print len(ids_not_fount), 'Ids não encontrados...'
-        self.genes_hash = hash_to_modify
-        return self
+        copy_to_return = cPickle.loads(cPickle.dumps(self, -1))
+        copy_to_return.genes_hash = hash_to_modify
+        return copy_to_return
 
     def transcripts_list(self):
         transcript_list_return = []
@@ -292,4 +292,3 @@ class GTF_manager():
 
         for attr_field_print in self.__attr_list.iterkeys():
             print attr_field_print
-

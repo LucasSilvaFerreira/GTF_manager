@@ -4,8 +4,7 @@ import sys
 import re
 from tqdm import tqdm
 from pybedtools import BedTool, tempfiles
-import copy
-
+import cPickle
 
 class Transcript():
     def __init__(self, transcript_name, exons_array, attr_list):
@@ -15,8 +14,15 @@ class Transcript():
         self.strand = self.exons[0][6]
         self.__attr_list = attr_list
         self.exon_count = len(exons_array)
-        self.transcript_length = self.__get_transcrip_size()
         self.attrs = self.__parse_attrs()  # aqui eu deixarei todos os atributos dos genes em um dict
+
+
+    def locus_size_total(self):
+        chr, s, e = self.locus_coords()
+        return e-s
+
+    def transcript_exons_length_sum(self):
+        return self.__get_transcrip_size()
 
     def exon_size(self, one_exon_in_array):
         return int(one_exon_in_array[4]) - int(one_exon_in_array[3])
@@ -56,7 +62,6 @@ class Transcript():
         chr, start, end = map(str, self.locus_coords())
         return '\t'.join([chr, start, end, self.transcript_name, self.gene_info, self.strand])
 
-
 class Gene_content():
     def __init__(self, gene_id,
                  strand,
@@ -64,7 +69,6 @@ class Gene_content():
                  info_gene_str,
                  attr_transcript_field
                  ):
-        print 'O PARSER DE ATTRS deve mostrar apenas os campos que se repetem. Ou os attrs ficaram com informacoes que modificam entre os de exons'
         self.gene_id = gene_id
         self.gene_info = info_gene_str
         self.strand = strand  # checar se strand existe na posicao correta else: return error
@@ -113,7 +117,6 @@ class Gene_content():
                            attr_list=self.__child_transcript_possible_fields) for ts_key, ts_values_array in
                 self.transcripts_ids.iteritems()]
 
-
 class GTF_manager():
     def __init__(self, gtf_file):
         """GTF_managers offers a easy-use parser to handle gtf files.
@@ -134,15 +137,18 @@ class GTF_manager():
              for transcripts in my_gene.get_transcripts():
                  print transcripts.attrs("transcript_status")
 
+        Attributes:
+            self.file_name (str): Return the GTF file PATH
 
 
         Args:
             gtf_file (str): system PATH with a gtf file.
         """
+        print 'O PARSER DE ATTRS deve mostrar apenas os campos que se repetem. Ou os attrs ficariam com informacoes que modificam entre os de exons'
         self.file_name = gtf_file
         self.gtf_file_open = [line_gtf.split('\t') for line_gtf in open(gtf_file, 'r').read().split('\n') if
                               len(line_gtf) > 0]
-        self.__attr_list = {}
+        self.__attr_list = {} # pode dar erro depois de extrair genes utilizando select
         self.genes_hash = self.__parse_lines()
 
     def __parse_lines(self):
@@ -200,10 +206,26 @@ class GTF_manager():
 
         print '\n Parsing finished...'
 
+    def number_of_genes_loci(self):
+        return len(self.genes_hash)
+
     def gene_list(self):
+        """
+
+        Returns:
+            Gene_content
+        """
         return [gene_content for gene_content in self.genes_hash.itervalues()]
 
     def gene_list_to_bed6(self, file_name=None, save_in_file=False):
+        """
+
+        Returns:
+
+            BedTool: BedTool object with gene_ids inside.
+            or
+            Save a ".bed" in specified path in save_in_file parameter.
+        """
         bed6_genes = [gene_to_b6.get_bed6() for gene_to_b6 in self.gene_list()]
         # aqui deve entrar algum distema de filtros
         bed6_genes = BedTool('\n'.join(bed6_genes), from_string=True).sort()
@@ -228,8 +250,9 @@ class GTF_manager():
                 print remove_id
         if len(ids_not_fount) > 0:
             print len(ids_not_fount), 'Ids não encontrados...'
-        self.genes_hash = hash_to_modify
-        return self
+        copy_to_return = cPickle.loads(cPickle.dumps(self, -1))
+        copy_to_return.genes_hash = hash_to_modify
+        return copy_to_return
 
     def transcripts_list(self):
         transcript_list_return = []
@@ -239,6 +262,14 @@ class GTF_manager():
         return transcript_list_return
 
     def transcripts_list_to_bed6(self, file_name=None, save_in_file=False):
+        """
+
+        Returns:
+
+            BedTool: BedTool object with Transcripts inside.
+            or
+            Save a ".bed" in specified path in save_in_file parameter.
+        """
 
         bed6_trans = [trans_to_b6.get_bed6() for trans_to_b6 in self.transcripts_list()]
         # aqui deve entrar algum distema de filtros
