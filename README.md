@@ -78,7 +78,7 @@ If you need iterate over all transcripts you can use the shortcut:
 
     for transcript in gtf.transcripts_list():
         print transcript.exon_count #  print the total number of exons in transcript
-        for exon in transcripts.exons: #  iterates over all exons in transcript
+        for exon in transcript.exons: #  iterates over all exons in transcript
             print transcript.transcript_name #  print transcript_name
             print exon  # Print the specific exon line
             
