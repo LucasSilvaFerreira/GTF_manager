@@ -18,8 +18,9 @@ With simple commands you can creates a object called gtf and parses a file insid
     gtf = GTF_manager('path/to/my_gtf_file.gtf')
 ```
 
-GTF_manager separates the file lines in two main object types: 'genes' and 'transcripts'.
-The 'genes' contains the description about total locus and all keep a list of all transcripts inside that locus.
+GTF_manager separates the file lines in two main object types:  `genes` and `transcripts`.
+The `genes` contains the description about a complete locus and keep a list of all `transcripts` inside that locus.
+
 To print all gene locus in bed6 format in your screen you need the function `gene_list_to_bed6`:
 ```
     for genebed6 in gtf.gene_list_to_bed6(): #
@@ -50,7 +51,7 @@ Here are a small list of possible operations using this class.
  
  Getting the name of all transcripts inside locus:
  ```
-    get_transcripts_ids()
+    my_gene.get_transcripts_ids()
     
 ```
 You can iterate over all transcripts inside a specific locus and print yours `transcript_name` using :
@@ -59,7 +60,7 @@ You can iterate over all transcripts inside a specific locus and print yours `tr
         print transcripts.transcript_name
 ```
 
-If you are interested in check the fields inside the gtf object, you can print this keys in the screen using the  'gtf' object.
+If you are interested in check the fields inside the gtf object, you can print this keys in the screen using the  `gtf` object.
 ```
     gtf.print_attrs_fields()  # list all attr possible inside Transcripts objects.
 ```
