@@ -14,8 +14,16 @@ class Transcript():
         self.strand = self.exons[0][6]
         self.__attr_list = attr_list
         self.exon_count = len(exons_array)
-        self.attrs = self.__parse_attrs()  # aqui eu deixarei todos os atributos dos genes em um dict
+        self.__attrs = self.__parse_attrs()  # aqui eu deixarei todos os atributos dos genes em um dict
 
+
+
+    def get_attrs(self):
+        return self.__attrs
+
+    def set_new_attr(self, attr_key, attr_value):
+        dict_attr = self.__attrs
+        dict_attr[attr_key] = attr_value
 
     def locus_size_total(self):
         chr, s, e = self.locus_coords()
@@ -32,9 +40,33 @@ class Transcript():
 
     def __parse_attrs(self):
 
-        fields_to_parse = {field.strip(' ').split(' ')[0]: field.strip(' ').split(' ')[1]
-                           for field in self.exons[-1][-1].strip(';').split(';')}  # get the last exon to parse attrs
-        # print 'ftp', len(fields_to_parse), 'attr_list', len([x for x in self.__attr_list])
+        # selecting just the unique fields inside all transcripts exons.
+        fields_unique={}
+        for field_u_exon in self.exons:
+            field_attrs = field_u_exon[-1].strip(';').split(';')
+            for field_x in field_attrs:
+                field_key = field_x.strip(' ').split(' ')[0]
+                field_value = field_x.strip(' ').split(' ')[1]
+                if field_key in fields_unique:
+                    fields_unique[field_key].append(field_value)
+                else:
+                    fields_unique[field_key] = []
+                    fields_unique[field_key].append(field_value)
+        #poping the keys with size different of exons size array. THis will keep just no variant attrs
+
+        keys_to_pop = [possible_key for possible_key, value in fields_unique.iteritems() if len(list(set(value)))!=1]
+
+        #exclude keys_to_pop from attrs
+        fields_to_parse= {}
+        for field in self.exons[-1][-1].strip(';').split(';'):
+            key_parse = field.strip(' ').split(' ')[0]
+            value_parse = field.strip(' ').split(' ')[1]
+            if not key_parse in keys_to_pop:
+                fields_to_parse[key_parse] = value_parse
+            else: # this happen when the key change between exons
+                fields_to_parse[key_parse] = "Non_transcript_level_information"
+
+
         hash_to_load_return = {}
         for attr in self.__attr_list:
             if attr in fields_to_parse:
