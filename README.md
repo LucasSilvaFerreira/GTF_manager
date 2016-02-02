@@ -24,7 +24,7 @@ The `Gene_content` contains the description about a complete locus and keep a li
 To print all gene locus in **bed6** format in your screen you need the function `gene_list_to_bed6`:
 ```python
     for genebed6 in gtf.gene_list_to_bed6(): #
-       print genebed6.gene_id
+       print genebed6
 ```
 Saves a bed6 files is easy:
 ```python
@@ -33,11 +33,11 @@ Saves a bed6 files is easy:
 There the possibility to get a specific gene using the function `get_gene()`:
 
 ```python
-    my_gene = gtf.get_gene("ENSG00000180198.11") # Pass the gene_id with argument
+    my_gene = gtf.get_gene("ENSG00000180198.11") # Pass the gene_id with argument (use a valid gene id)
 ```
 Now `my_gene` objects is a instance of **Gene_content** class and you can do some operations.
 
-Here are a small list of possible operations using this class.
+Here is a small list of possible operations using this class.
 
 ```python
     print type(my_gene)
@@ -76,7 +76,7 @@ After gets all possible attrs in your file, you can call this attr inside `trans
 If you need iterate over all transcripts you can use the shortcut:
 ```python
 
-    for transcripts in gtf.transcripts_list():
+    for transcript in gtf.transcripts_list():
         print transcript.exon_count #  print the total number of exons in transcript
         for exon in transcripts.exons: #  iterates over all exons in transcript
             print transcript.transcript_name #  print transcript_name
