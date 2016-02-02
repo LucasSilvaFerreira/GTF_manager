@@ -7,7 +7,7 @@ Iterate over gtf file and extract relevant informations
 - pybedtools
 - tqdm
 
-## BASIC USAGE
+## Basic usage
 
 GTF_manager offers a easy-use parser to handle gtf files.
 
