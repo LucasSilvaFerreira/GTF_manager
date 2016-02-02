@@ -7,6 +7,9 @@ Iterate over gtf file and extract relevant informations
 - pybedtools
 - tqdm
 
+## Alert
+This package `just` considere lines tagged with `exon` in GTF File. Using this, the GTF_manager class will reconstruct `genes` and `transcripts`.
+
 ## Basic usage
 
 GTF_manager offers a easy-use parser to handle gtf files.
