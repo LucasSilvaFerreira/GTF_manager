@@ -9,7 +9,7 @@ Iterate over gtf file and extract relevant informations
 
 ## BASIC USAGE
 
-GTF_managers offers a easy-use parser to handle gtf files.
+GTF_manager offers a easy-use parser to handle gtf files.
 
 With simple commands you can creates a object called gtf and parses a file inside it.
 ```
