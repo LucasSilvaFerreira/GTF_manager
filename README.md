@@ -18,8 +18,8 @@ With simple commands you can creates a object called gtf and parses a file insid
     gtf = GTF_manager('path/to/my_gtf_file.gtf')
 ```
 
-GTF_manager separates the file lines in two main object types:  `genes` and `transcripts`.
-The `genes` contains the description about a complete locus and keep a list of all `transcripts` inside that locus.
+`GTF_manager` separates the GTF file lines in two main object types:  `Gene_content` and `transcripts`.
+The `Gene_content` contains the description about a complete locus and keep a list of all `transcripts` inside that locus.
 
 To print all gene locus in **bed6** format in your screen you need the function `gene_list_to_bed6`:
 ```
@@ -36,6 +36,7 @@ There the possibility to get a specific gene using the function `get_gene()`:
     my_gene = gtf.get_gene("ENSG00000180198.11") # Pass the gene_id with argument
 ```
 Now `my_gene` objects is a instance of **Gene_content** class and you can do some operations.
+
 Here are a small list of possible operations using this class.
 
 ``` 
@@ -60,15 +61,17 @@ You can iterate over all transcripts inside a specific locus and print yours `tr
         print transcripts.transcript_name
 ```
 
-If you are interested in check the attr fields inside the `gtf` object, you can print this keys in the screen using the  a `gtf` object method.
+If you are interested in check the attr fields inside the `gtf` object, you can print this keys in the screen using a `gtf` object method.
 ```
     gtf.print_attrs_fields()  # list all attr possible inside Transcripts objects.
 ```
-After gets all possible attrs you can call this attr inside `transcript` objects
+After gets all possible attrs in your file, you can call this attr inside `transcript` objects passing it like a key:
 
 ```
+
     for transcripts in my_gene.get_transcripts():
         print transcripts.attrs("transcript_status")
+        
 ```
 If you need iterate over all transcripts you can use the shortcut:
 ```
@@ -78,5 +81,6 @@ If you need iterate over all transcripts you can use the shortcut:
         for exon in transcripts.exons: #  iterates over all exons in transcript
             print transcript.transcript_name #  print transcript_name
             print exon  # Print the specific exon line
+            
 ```
 
